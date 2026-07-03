@@ -29,7 +29,7 @@ async function bootstrap() {
       //     return 100;
       //   }
       // },
-      limit: () => {
+      limit: (req) => {
         const getInfo=geolite.lookup(req.ip) || {};
         return getInfo.country == "EG" ? 3 : 1; // limit to 3 requests per minute for users from Egypt, no limit for other countries
       },
