@@ -30,8 +30,8 @@ async function bootstrap() {
       //   }
       // },
       limit: () => {
-        const getInfo=geolite.lookup(req.ip);
-        return getInfo.country == "EG" ? 3 : 0; // limit to 3 requests per minute for users from Egypt, no limit for other countries
+        const getInfo=geolite.lookup(req.ip) || {};
+        return getInfo.country == "EG" ? 3 : 1; // limit to 3 requests per minute for users from Egypt, no limit for other countries
       },
       // limit: 100, // limit each IP to 100 requests per windowMs
       // message: "Too many requests from this user, please try again later.",
