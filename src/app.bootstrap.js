@@ -22,50 +22,50 @@ async function bootstrap() {
     express.json(),
     cors({}),
     helmet(),
-    rateLimit({
-      windowMs: 1 * 60 * 1000, // 1 minute
-      // limit: () => {
-      //   if (process.env.NODE_ENV === "prod") {
-      //     return 100;
-      //   }
-      // },
-      limit: (req) => {
-        const getInfo=geolite.lookup(req.ip) || {};
-        return getInfo.country == "EG" ? 3 : 1; // limit to 3 requests per minute for users from Egypt, no limit for other countries
-      },
-      // limit: 100, // limit each IP to 100 requests per windowMs
-      // message: "Too many requests from this user, please try again later.",
-      legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-      // statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
-      // standardHeaders: true, // Enable the `RateLimit-*` headers
-      // skipFailedRequests: true, // Do not count failed requests (status >= 400) against the rate limit
-      // skipSuccessfulRequests: false, // Count successful requests (status < 400) against the rate limit
-      handler: (req, res) => {
-        res.status(429).json({
-          message: "Too many requests from this user, please try again later.",
-        });
-      }, //overload status code and message for rate limit exceeded error
-      requestPropertyName: "rateLimit", // Add rate limit info to request object
-      keyGenerator: (req) => {
-        const ip = ipKeyGenerator(req.ip)
-        return `${ip}-${req.path}`; // Use IP and path as the key for rate limiting
-      },
-      store:{
-        async incr(key,cb){
-          const hits =await redisService.incr(key);
-          if(hits === 1){
-            await redisService.setExpire(key, 60); // set expiration for the key to 60 seconds (1 minute) when it's first created
-          }
-          cb(null,hits);
-        },
-        async decrement(key,cb){
-          const isKeyExist=await redisService.exists(key);
-          if(isKeyExist){
-            await redisService.decr(key);
-          }
-        }
-      }
-    }),
+    // rateLimit({
+    //   windowMs: 1 * 60 * 1000, // 1 minute
+    //   // limit: () => {
+    //   //   if (process.env.NODE_ENV === "prod") {
+    //   //     return 100;
+    //   //   }
+    //   // },
+    //   limit: (req) => {
+    //     const getInfo=geolite.lookup(req.ip) || {};
+    //     return getInfo.country == "EG" ? 3 : 1; // limit to 3 requests per minute for users from Egypt, no limit for other countries
+    //   },
+    //   // limit: 100, // limit each IP to 100 requests per windowMs
+    //   // message: "Too many requests from this user, please try again later.",
+    //   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    //   // statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
+    //   // standardHeaders: true, // Enable the `RateLimit-*` headers
+    //   // skipFailedRequests: true, // Do not count failed requests (status >= 400) against the rate limit
+    //   // skipSuccessfulRequests: false, // Count successful requests (status < 400) against the rate limit
+    //   handler: (req, res) => {
+    //     res.status(429).json({
+    //       message: "Too many requests from this user, please try again later.",
+    //     });
+    //   }, //overload status code and message for rate limit exceeded error
+    //   requestPropertyName: "rateLimit", // Add rate limit info to request object
+    //   keyGenerator: (req) => {
+    //     const ip = ipKeyGenerator(req.ip)
+    //     return `${ip}-${req.path}`; // Use IP and path as the key for rate limiting
+    //   },
+    //   store:{
+    //     async incr(key,cb){
+    //       const hits =await redisService.incr(key);
+    //       if(hits === 1){
+    //         await redisService.setExpire(key, 60); // set expiration for the key to 60 seconds (1 minute) when it's first created
+    //       }
+    //       cb(null,hits);
+    //     },
+    //     async decrement(key,cb){
+    //       const isKeyExist=await redisService.exists(key);
+    //       if(isKeyExist){
+    //         await redisService.decr(key);
+    //       }
+    //     }
+    //   }
+    // }),
   );
 
   app.use("/", (req, res, next) => {
